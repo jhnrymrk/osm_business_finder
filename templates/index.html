@@ -31,6 +31,10 @@
             object-fit: cover;
             border-radius: 50%;
         }
+
+        .phone {
+            white-space: nowrap;
+        }
     </style>
 </head>
 
@@ -89,12 +93,12 @@
                 <th>Logo</th>
                 <th>Name</th>
                 <th>Address</th>
+                <th>Phone</th>
                 <th>Website</th>
                 <th>Map</th>
             </tr>
         </thead>
-        <tbody>
-        </tbody>
+        <tbody></tbody>
     </table>
 </div>
 
@@ -102,12 +106,14 @@
 $(document).ready(function() {
     let table = $('#results-table').DataTable({
         columnDefs: [
-            { orderable: false, targets: [1, 5] } 
+            { orderable: false, targets: [1, 6] }
         ]
     });
 
     $("#search").click(function () {
-        let selected = $("input[type=checkbox]:checked").map(function(){ return this.value; }).get();
+        let selected = $("input[type=checkbox]:checked").map(function(){ 
+            return this.value; 
+        }).get();
 
         if (selected.length === 0) {
             alert("Please select at least one business type");
@@ -115,7 +121,6 @@ $(document).ready(function() {
         }
 
         $("#preloader").css("display", "flex");
-
         table.clear().draw();
 
         $.post("/search", {
@@ -128,14 +133,26 @@ $(document).ready(function() {
                     if (!item.name) return;
 
                     let logoHtml = `<img src="${item.logo}" class="logo-thumb">`;
-                    let websiteHtml = item.website ? `<a href="${item.website}" target="_blank">${item.website}</a>` : '';
-                    let mapHtml = `<a href="https://www.openstreetmap.org/?mlat=${item.lat}&mlon=${item.lon}" target="_blank">View Map</a>`;
+
+                    let phoneHtml = item.phone
+                        ? `<a href="tel:${item.phone}" class="phone">${item.phone}</a>`
+                        : `<span class="text-muted">N/A</span>`;
+
+                    let websiteHtml = item.website
+                        ? `<a href="${item.website}" target="_blank">${item.website}</a>`
+                        : '';
+
+                    let mapHtml = `
+                        <a href="https://www.openstreetmap.org/?mlat=${item.lat}&mlon=${item.lon}" 
+                           target="_blank">View Map</a>
+                    `;
 
                     table.row.add([
                         type,
                         logoHtml,
                         item.name,
                         item.address,
+                        phoneHtml,
                         websiteHtml,
                         mapHtml
                     ]).draw(false);

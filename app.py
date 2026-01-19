@@ -85,6 +85,15 @@ def search():
                 continue
 
             website = tags.get("website", "")
+
+            phone = (
+                tags.get("phone")
+                or tags.get("contact:phone")
+                or tags.get("mobile")
+                or tags.get("contact:mobile")
+                or ""
+            )
+
             logo = tags.get("logo", "")
 
             if not logo and website:
@@ -101,8 +110,9 @@ def search():
                 "name": name,
                 "lat": lat,
                 "lon": lon,
-                "address": address,
+                "address": address.strip(", "),
                 "website": website,
+                "phone": phone,
                 "logo": logo
             }
 
@@ -113,4 +123,4 @@ def search():
     return jsonify(result)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='10.10.111.95', port=5000, debug=True)
